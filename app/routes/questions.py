@@ -27,14 +27,37 @@ def create_question():
 
 @questions_bp.route('/<int:question_id>', methods=['GET'])
 def get_question(question_id):
-    return f'Detailed question: {question_id}'
+    question = Question.query.get(question_id)
+
+    if question is None:
+        return jsonify({'message': 'Question with this ID not found'}), 404
+
+    return jsonify({'id': f'{question.id}', 'message': f'{question.text}'}), 200
 
 
 @questions_bp.route('/<int:question_id>', methods=['PUT'])
 def update_question(question_id):
-    return f'Question {question_id} was updated'
+    question = Question.query.get(question_id)
+
+    if question is None:
+        return jsonify({'message': 'Question with this ID not found'}), 404
+
+    data = request.get_json()
+    if 'text' in data:
+        question.text = data['text']
+        db.session.commit()
+        return jsonify({'message': 'Question updated'}), 200
+    else:
+        return jsonify({'message': 'Missing text'}), 400
 
 
 @questions_bp.route('/<int:question_id>', methods=['DELETE'])
 def delete_question(question_id):
-    return f'Question {question_id} was deleted'
+    question = Question.query.get(question_id)
+
+    if question is None:
+        return jsonify({'message': 'Question with this ID not found'}), 404
+
+    db.session.delete(question)
+    db.session.commit()
+    return jsonify({'message': f'Question {question.id} deleted'}), 200
