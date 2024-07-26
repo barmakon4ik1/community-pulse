@@ -9,7 +9,7 @@ class Question(db.Model):
     responses = db.relationship('Response', backref='question', lazy=True)
 
     def __repr__(self):
-        return f'Question {self.id}'
+        return f'Question: {self.text}'
 
 
 class Statistic(db.Model):
